@@ -4,7 +4,7 @@ object Day3 extends aoc.Day {
   override def num: Int = 3
 
   extension (c: Char) {
-    def toPriority = if c.isUpper then c.toInt - 38 else c.toInt - 96
+    def toPriority = c.toInt - (if c.isUpper then 38 else 96)
   }
 
   override def solve(input: Seq[String]): (Any, Any) =
