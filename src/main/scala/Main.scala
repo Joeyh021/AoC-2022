@@ -1,10 +1,10 @@
 package aoc
 
-@main def AoC(day: Int) = println(
+@main def AoC(n: Int) = println(
   solvedDays
-    .lift(day)
+    .lift(n)
     .map { day =>
-      val (p1, p2) = day.run(); s"Part 1: $p1\nPart 2: $p2"
+      val (p1, p2) = day.run(n); s"Part 1: $p1\nPart 2: $p2"
     } getOrElse "Day unimplemented!"
 )
 

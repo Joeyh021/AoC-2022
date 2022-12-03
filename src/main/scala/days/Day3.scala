@@ -1,8 +1,6 @@
 package days
 
 object Day3 extends aoc.Day {
-  override def num: Int = 3
-
   extension (c: Char) {
     def toPriority = c.toInt - (if c.isUpper then 38 else 96)
   }

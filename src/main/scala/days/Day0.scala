@@ -6,8 +6,6 @@ import scala.io.Source
 
 //Day 1 from 2021
 object Day0 extends Day {
-  def num = 0
-
   override def solve(input: Seq[String]) = {
     val ints  = input.map(_.toInt)
     val part1 = ints.zip(ints.tail).map((x, y) => if y > x then 1 else 0).sum

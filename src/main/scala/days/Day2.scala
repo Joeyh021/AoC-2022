@@ -1,8 +1,6 @@
 package days
 
 object Day2 extends aoc.Day {
-  def num = 2
-
   //   A B C
   // X 4 1 7
   // Y 8 5 2

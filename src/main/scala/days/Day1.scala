@@ -1,9 +1,6 @@
 package days
 
 object Day1 extends aoc.Day {
-
-  override def num: Int = 1
-
   override def solve(input: Seq[String]) = {
     val calories = input
       .foldLeft(List(0)) { (acc, x) =>
