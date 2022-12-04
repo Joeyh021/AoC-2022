@@ -1,7 +1,6 @@
 package aoc
 
 import java.time.LocalDate
-import scala.util.CommandLineParser.FromString
 
 lazy val isDecember22 = LocalDate.now().getYear() == 2022 && LocalDate.now().getMonthValue() == 12
 lazy val today        = LocalDate.now().getDayOfMonth()
