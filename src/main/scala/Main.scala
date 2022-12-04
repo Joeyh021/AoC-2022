@@ -9,4 +9,4 @@ package aoc
 )
 
 import days._
-def solvedDays = Vector(Day0, Day1, Day2, Day3)
+def solvedDays = Vector(Day0, Day1, Day2, Day3, Day4)
