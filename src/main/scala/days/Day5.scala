@@ -1,58 +1,42 @@
 package days
 
-import scala.collection.mutable.ArrayBuffer
-
 object Day5 extends aoc.Day:
-  type Stacks = ArrayBuffer[ArrayBuffer[Char]]
+  type Stacks = Vector[Vector[Char]]
 
   // the top bit of the input, manually parsed
   val init =
-    ArrayBuffer(
-      ArrayBuffer('H', 'C', 'R'),
-      ArrayBuffer('B', 'J', 'H', 'L', 'S', 'F'),
-      ArrayBuffer('R', 'M', 'D', 'H', 'J', 'T', 'Q'),
-      ArrayBuffer('S', 'G', 'R', 'H', 'Z', 'B', 'J'),
-      ArrayBuffer('R', 'P', 'F', 'Z', 'T', 'D', 'C', 'B'),
-      ArrayBuffer('T', 'H', 'C', 'G'),
-      ArrayBuffer('S', 'N', 'V', 'Z', 'B', 'P', 'W', 'L'),
-      ArrayBuffer('R', 'J', 'Q', 'G', 'C'),
-      ArrayBuffer('L', 'D', 'T', 'R', 'H', 'P', 'F', 'S')
+    Vector(
+      Vector('H', 'C', 'R'),
+      Vector('B', 'J', 'H', 'L', 'S', 'F'),
+      Vector('R', 'M', 'D', 'H', 'J', 'T', 'Q'),
+      Vector('S', 'G', 'R', 'H', 'Z', 'B', 'J'),
+      Vector('R', 'P', 'F', 'Z', 'T', 'D', 'C', 'B'),
+      Vector('T', 'H', 'C', 'G'),
+      Vector('S', 'N', 'V', 'Z', 'B', 'P', 'W', 'L'),
+      Vector('R', 'J', 'Q', 'G', 'C'),
+      Vector('L', 'D', 'T', 'R', 'H', 'P', 'F', 'S')
     )
-
-  def p1(stacks: Stacks, x: (Int, Int, Int)): Stacks = {
-    val crates = stacks(x._2).takeRight(x._1)
-    stacks(x._2).dropRightInPlace(x._1)
-    stacks(x._3) ++= crates.reverse
-    stacks
-  }
-
-  def p2(stacks: Stacks, x: (Int, Int, Int)): Stacks = {
-    val crates = stacks(x._2).takeRight(x._1)
-    stacks(x._2).dropRightInPlace(x._1)
-    stacks(x._3) ++= crates
-    stacks
-  }
 
   override def solve(input: Seq[String]): (Any, Any) =
     val pattern = """move (\d*) from (\d*) to (\d*)""".r
-    val parsed = input
-      .map(
-        _ match
-          case pattern(amnt, from, to) => (amnt.toInt, from.toInt - 1, to.toInt - 1)
-      )
 
-    def run(f: (Stacks, (Int, Int, Int)) => Stacks): String = parsed
-      .foldLeft(init)(f)
-      .map(_.last)
-      .mkString
-
-    (
-      parsed
-        .foldLeft(init.map(_.clone))(p1)
-        .map(_.last)
-        .mkString,
-      parsed
-        .foldLeft(init.map(_.clone))(p2)
+    val run = (flip: Boolean) =>
+      input
+        .map(
+          _ match
+            case pattern(count, from, to) => (count.toInt, from.toInt - 1, to.toInt - 1)
+        )
+        .foldLeft(init) { (stacks, x) =>
+          val (count, from, to) = x
+          stacks
+            .updated(
+              to,
+              stacks(to) ++ (if flip then stacks(from).takeRight(count).reverse
+                             else stacks(from).takeRight(count))
+            )
+            .updated(from, stacks(from).dropRight(count))
+        }
         .map(_.last)
         .mkString
-    )
+
+    (run(true), run(false))
