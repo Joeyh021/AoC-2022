@@ -1,8 +1,8 @@
 package days
 
-object Day5 extends aoc.Day:
-  type Stacks = Vector[Vector[Char]]
+import scala.util.chaining._
 
+object Day5 extends aoc.Day:
   // the top bit of the input, manually parsed
   val init =
     Vector(
@@ -29,11 +29,7 @@ object Day5 extends aoc.Day:
         .foldLeft(init) { (stacks, x) =>
           val (count, from, to) = x
           stacks
-            .updated(
-              to,
-              stacks(to) ++ (if flip then stacks(from).takeRight(count).reverse
-                             else stacks(from).takeRight(count))
-            )
+            .updated(to, stacks(to) ++ stacks(from).takeRight(count).pipe(v => if flip then v.reverse else v))
             .updated(from, stacks(from).dropRight(count))
         }
         .map(_.last)
