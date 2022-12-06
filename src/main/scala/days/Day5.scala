@@ -17,7 +17,7 @@ object Day5 extends aoc.Day:
       Vector('L', 'D', 'T', 'R', 'H', 'P', 'F', 'S')
     )
 
-  override def solve(input: Seq[String]): (Any, Any) =
+  override def solve(input: String): (Any, Any) =
     val pattern = """move (\d*) from (\d*) to (\d*)""".r
 
     val run = (flip: Boolean) =>

@@ -2,9 +2,9 @@ package days
 
 object Day4 extends aoc.Day {
 
-  override def solve(input: Seq[String]): (Any, Any) =
+  override def solve(input: String): (Any, Any) =
     val pattern = """(\d*)-(\d*),(\d*)-(\d*)""".r
-    val parsed = input
+    val parsed = input.linesIterator
       .map(
         _ match
           case pattern(a, b, c, d) => (a.toInt to b.toInt, c.toInt to d.toInt)

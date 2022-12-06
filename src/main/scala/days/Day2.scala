@@ -11,11 +11,11 @@ object Day2 extends aoc.Day {
   // Y 4 5 6
   // Z 8 9 7
 
-  def solve(input: Seq[String]): (Any, Any) = {
+  def solve(input: String): (Any, Any) = {
     val t1 = Vector(Vector(4, 1, 7), Vector(8, 5, 2), Vector(3, 9, 6))
     val t2 = Vector(Vector(3, 1, 2), Vector(4, 5, 6), Vector(8, 9, 7))
     val s = (t: Vector[Vector[Int]]) =>
-      input.map(i => t(i.split(' ')(1)(0).toInt - 88)(i.split(' ')(0)(0).toInt - 65)).sum
+      input.linesIterator.map(i => t(i.split(' ')(1)(0).toInt - 88)(i.split(' ')(0)(0).toInt - 65)).sum
     (s(t1), s(t2))
   }
 

@@ -5,14 +5,14 @@ object Day3 extends aoc.Day {
     def toPriority = c.toInt - (if c.isUpper then 38 else 96)
   }
 
-  override def solve(input: Seq[String]): (Any, Any) =
+  override def solve(input: String): (Any, Any) =
     (
-      input
+      input.linesIterator
         .map(l => l.splitAt(l.size / 2))
         .map((_ intersect _))
         .map(_.head.toPriority)
         .sum,
-      input
+      input.linesIterator
         .grouped(3)
         .map(_.reduce(_ intersect _).head.toPriority)
         .sum
