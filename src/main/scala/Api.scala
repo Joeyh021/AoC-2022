@@ -9,8 +9,8 @@ import java.nio.file.{ Files, Paths }
 import scala.sys.env
 
 object Api:
-  val cookie  = Using(Source.fromFile("cookie"))(f => f.mkString).get
-  val backend = HttpClientSyncBackend()
+  lazy val cookie  = Using(Source.fromFile("cookie"))(f => f.mkString).get
+  lazy val backend = HttpClientSyncBackend()
 
   def downloadInput(n: Int): String =
     val path = Paths.get(s"input/$n.txt")
@@ -22,5 +22,5 @@ object Api:
       .get(uri"https://adventofcode.com/2022/day/$n/input")
       .send(backend)
       .body match
-      case Left(error)  => throw Exception("Could not download input")
+      case Left(error)  => throw Exception(s"Could not download input: $error")
       case Right(input) => Using(FileWriter(File(s"input/$n.txt")))(i => i.write(input)); input
