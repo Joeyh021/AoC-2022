@@ -2,9 +2,12 @@ package aoc
 
 import scala.util.Using
 import scala.io.Source
+import java.nio.file.{ Files, Paths }
 
-trait Day {
+trait Day:
   def solve(input: String): (Any, Any)
 
-  def run(n: Int): (Any, Any) = Using(Source.fromFile(s"input/$n.txt"))(in => solve(in.mkString)).get
-}
+  def run(n: Int): (Any, Any) =
+    val path = Paths.get(s"input/$n.txt")
+    if Files.exists(path) then Using(Source.fromFile(path.toString))(input => solve(input.mkString)).get
+    else solve(Api.downloadInput(n))
