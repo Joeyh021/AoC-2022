@@ -14,7 +14,7 @@ object Day10 extends aoc.Day {
       val reg = values.last
       line match
         case "noop"     => values.append(reg)
-        case s"addx $i" => values.append(reg, reg + i.toInt)
+        case s"addx $i" => values.appendAll(Seq(reg, reg + i.toInt))
 
     val p1 = List(20, 60, 100, 140, 180, 220).map(i => i * values(i - 1)).sum
 
@@ -26,7 +26,7 @@ object Day10 extends aoc.Day {
       for (j <- 0 until 40)
         val reg = values(40 * i + j)
         p2.append(if (reg - 1 to reg + 1).contains(j) then ' ' else '█')
-      p2.append('█', '\n')
+      p2.appendAll(Seq('█', '\n'))
 
     (p1, p2.prepended('\n').appendedAll(Iterator.fill(42)('█')).mkString)
 
