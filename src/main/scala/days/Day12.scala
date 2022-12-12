@@ -12,7 +12,7 @@ object Day12 extends aoc.Day {
     (row, column)
   }
 
-  def getNeighbours(c: (Int, Int))(using g: IndexedSeq[IndexedSeq[Char]]) = {
+  def getNeighbours(up: Boolean)(c: (Int, Int))(using g: IndexedSeq[IndexedSeq[Char]]) = {
     val grid = g.map(_.map(_ match
       case 'S' => 'a'
       case 'E' => 'z'
@@ -22,10 +22,10 @@ object Day12 extends aoc.Day {
     val (i, j) = c
     List((i, j + 1), (i, j - 1), (i - 1, j), (i + 1, j))
       .filter((i, j) => i >= 0 && i < grid.size && j >= 0 && j < grid(0).size)
-      .filter(cs => grid(cs) <= grid(c) + 1)
+      .filter(nc => if up then (grid(nc) <= grid(c) + 1) else (grid(nc) + 1 >= grid(c)))
   }
 
-  def shortestPath(from: (Int, Int), to: (Int, Int))(using grid: IndexedSeq[IndexedSeq[Char]]) = {
+  def shortestPath(up: Boolean)(from: (Int, Int))(using grid: IndexedSeq[IndexedSeq[Char]]) = {
     val distances = mutable.Map((from, 0))
     val queue     = mutable.Queue[(Int, Int)]()
     val nodes = queue addAll (for {
@@ -35,14 +35,14 @@ object Day12 extends aoc.Day {
 
     // dijkstra, badly implemented
     while !(queue.isEmpty) do {
-      val v = queue.minBy(distances.getOrElse(_, Int.MaxValue))
+      val v = queue.minBy(distances.getOrElse(_, 9999))
       queue.dequeueAll(_ == v)
-      for (n <- getNeighbours(v)) {
-        val alt = distances.getOrElse(v, Int.MaxValue) + 1
-        if alt < distances.getOrElse(n, Int.MaxValue) then distances(n) = alt
+      for (n <- getNeighbours(up)(v)) {
+        val alt = distances.getOrElse(v, 9999) + 1
+        if alt < distances.getOrElse(n, 9999) then distances(n) = alt
       }
     }
-    distances(to)
+    distances
   }
 
   override def solve(input: String): (Any, Any) = {
@@ -51,9 +51,10 @@ object Day12 extends aoc.Day {
     val start = getCoord('S')
     val end   = getCoord('E')
 
-    val p1 = shortestPath(start, end)
+    val p1 = shortestPath(true)(start)(end)
+    val p2 = shortestPath(false)(end).filterKeys(grid(_) == 'a').values.toList.min.min(p1)
 
-    (p1, 0)
+    (p1, p2)
 
   }
 
