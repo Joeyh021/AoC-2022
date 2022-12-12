@@ -1,6 +1,7 @@
 package days
 
 import scala.collection.mutable
+
 object Day12 extends aoc.Day {
 
   extension (grid: IndexedSeq[IndexedSeq[Char]]) def apply(cs: (Int, Int)) = grid(cs._1)(cs._2)
@@ -24,13 +25,8 @@ object Day12 extends aoc.Day {
       .filter(cs => grid(cs) <= grid(c) + 1)
   }
 
-  override def solve(input: String): (Any, Any) = {
-    given grid: IndexedSeq[IndexedSeq[Char]] = input.linesIterator.map(_.iterator.toIndexedSeq).toIndexedSeq
-
-    val start = getCoord('S')
-    val end   = getCoord('E')
-
-    val distances = mutable.Map((start, 0))
+  def shortestPath(from: (Int, Int), to: (Int, Int))(using grid: IndexedSeq[IndexedSeq[Char]]) = {
+    val distances = mutable.Map((from, 0))
     val queue     = mutable.Queue[(Int, Int)]()
     val nodes = queue addAll (for {
       i <- 0 until grid.size
@@ -41,14 +37,23 @@ object Day12 extends aoc.Day {
     while !(queue.isEmpty) do {
       val v = queue.minBy(distances.getOrElse(_, Int.MaxValue))
       queue.dequeueAll(_ == v)
-
       for (n <- getNeighbours(v)) {
         val alt = distances.getOrElse(v, Int.MaxValue) + 1
         if alt < distances.getOrElse(n, Int.MaxValue) then distances(n) = alt
       }
     }
+    distances(to)
+  }
 
-    (distances(end), 0)
+  override def solve(input: String): (Any, Any) = {
+    given grid: IndexedSeq[IndexedSeq[Char]] = input.linesIterator.map(_.iterator.toIndexedSeq).toIndexedSeq
+
+    val start = getCoord('S')
+    val end   = getCoord('E')
+
+    val p1 = shortestPath(start, end)
+
+    (p1, 0)
 
   }
 
