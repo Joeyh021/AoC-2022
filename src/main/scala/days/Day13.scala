@@ -24,9 +24,9 @@ object Day13 extends aoc.Day {
         case (l: Int, rs: List[Packet]) => compare(List(l), rs)
         case (ls: List[Packet], r: Int) => compare(ls, List(r))
         case (l :: ls, r :: rs)         => val c = compare(l, r); if c == 0 then compare(ls, rs) else c
-        case (Nil, _ :: _)              => -1
-        case (_ :: _, Nil)              => 1
         case (Nil, Nil)                 => 0
+        case (Nil, _)                   => -1
+        case (_, Nil)                   => 1
 
   override def solve(input: String): (Any, Any) =
     val p1 =
