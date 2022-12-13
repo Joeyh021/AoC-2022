@@ -21,8 +21,8 @@ object Day13 extends aoc.Day {
       (left, right) match
         case (l: Int, r: Int) if l == r => 0
         case (l: Int, r: Int)           => l.compare(r)
-        case (l: Int, rs: List[Packet]) => compare(List(l), rs)
-        case (ls: List[Packet], r: Int) => compare(ls, List(r))
+        case (l: Int, rs)               => compare(List(l), rs)
+        case (ls, r: Int)               => compare(ls, List(r))
         case (l :: ls, r :: rs)         => val c = compare(l, r); if c == 0 then compare(ls, rs) else c
         case (Nil, Nil)                 => 0
         case (Nil, _)                   => -1
@@ -32,7 +32,6 @@ object Day13 extends aoc.Day {
     val p1 =
       input
         .split("\n\n")
-        .iterator
         .map(_.linesIterator.map(parsePacket.parseAll(_).toOption.get))
         .map(a => a.next() < a.next())
         .zipWithIndex
@@ -40,11 +39,11 @@ object Day13 extends aoc.Day {
         .map(_._2 + 1)
         .sum
 
-    val markers: Seq[Packet] = Seq(List(List(2)), List(List(6)))
+    val markers = IndexedSeq[Packet](List(List(2)), List(List(6)))
     val packets = input.linesIterator
       .filter(!_.isBlank)
-      .toList
       .map(parsePacket.parseAll(_).toOption.get)
+      .toList
       .appendedAll(markers)
       .sorted
 
