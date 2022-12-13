@@ -10,50 +10,45 @@ object Day13 extends aoc.Day {
   }
   type Packet = L[List, Int]
 
-  // enum Packet:
-  //   case I(i: Int)
-  //   case L(ps: List[Packet])
-
-  // import Packet._
-
-  // given Conversion[Int, Packet.I] with
-  //   def apply(i: Int) = Packet.I(i)
-
-  // given Conversion[List[Packet], Packet.L] with
-  //   def apply(l: List[Packet]) = Packet.L(l)
-
-  val parsePacket: Parser[Packet] = Parser.recursive { r =>
-    val list: Parser[Packet] = r
-      .repSep0(Parser.char(','))
-      .with1
+  val parsePacket = Parser.recursive[Packet] {
+    _.repSep0(Parser.char(',')).with1
       .between(Parser.char('['), Parser.char(']'))
-    val num: Parser[Packet] = digits.map(c => c.toInt)
-
-    list | num
+      | digits.map(c => c.toInt)
   }
 
-  def isOrdered(left: Packet, right: Packet): Option[Boolean] =
-    (left, right) match
-      case (l: Int, r: Int) if l == r => None
-      case (l: Int, r: Int)           => Some(l < r)
-      case (l: Int, rs: List[Packet]) => isOrdered(List(l), rs)
-      case (ls: List[Packet], r: Int) => isOrdered(ls, List(r))
-      case (l :: ls, r :: rs)         => isOrdered(l, r) orElse isOrdered(ls, rs)
-      case (Nil, _ :: _)              => Some(true)
-      case (_ :: _, Nil)              => Some(false)
-      case (Nil, Nil)                 => None
+  given Ordering[Packet] with
+    def compare(left: Packet, right: Packet): Int =
+      (left, right) match
+        case (l: Int, r: Int) if l == r => 0
+        case (l: Int, r: Int)           => l.compare(r)
+        case (l: Int, rs: List[Packet]) => compare(List(l), rs)
+        case (ls: List[Packet], r: Int) => compare(ls, List(r))
+        case (l :: ls, r :: rs)         => val c = compare(l, r); if c == 0 then compare(ls, rs) else c
+        case (Nil, _ :: _)              => -1
+        case (_ :: _, Nil)              => 1
+        case (Nil, Nil)                 => 0
 
   override def solve(input: String): (Any, Any) =
     val p1 =
       input
         .split("\n\n")
         .iterator
-        .map(_.linesIterator.map(parsePacket.parseAll(_).getOrElse(-1)).toList)
-        .map(a => isOrdered(a.head, a.last).get)
+        .map(_.linesIterator.map(parsePacket.parseAll(_).toOption.get))
+        .map(a => a.next() < a.next())
         .zipWithIndex
-        .toList
         .filter(_._1)
         .map(_._2 + 1)
         .sum
-    (p1, 0)
+
+    val markers: Seq[Packet] = Seq(List(List(2)), List(List(6)))
+    val packets = input.linesIterator
+      .filter(!_.isBlank)
+      .toList
+      .map(parsePacket.parseAll(_).toOption.get)
+      .appendedAll(markers)
+      .sorted
+
+    val p2 = (packets.indexOf(markers(0)) + 1) * (packets.indexOf(markers(1)) + 1)
+
+    (p1, p2)
 }
