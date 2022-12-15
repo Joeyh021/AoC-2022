@@ -22,30 +22,28 @@ object Day14 extends aoc.Day {
     @tailrec
     def p1(pos: Coord): Option[Coord] =
       // if oob, stop trying to place
-      if pos._2 >= floor then return None
-
-      val sq = cave.getOrElse(pos, Empty)
-      // if we're in empty space, this move was good and keep going
-      if sq == Empty then p1(pos._1, pos._2 + 1)
+      if pos._2 >= floor then None
       else {
-        // try go left
-        if cave.getOrElse((pos._1 - 1, pos._2), Empty) == Empty then p1(pos._1 - 1, pos._2)
-        // try go right
-        else if cave.getOrElse((pos._1 + 1, pos._2), Empty) == Empty then p1(pos._1 + 1, pos._2)
-        // settle
-        else Some((pos._1, pos._2 - 1))
+        // if we're in empty space, this move was good and keep going
+        if cave.getOrElse(pos, Empty) == Empty then p1(pos._1, pos._2 + 1)
+        else {
+          // try go left
+          if cave.getOrElse((pos._1 - 1, pos._2), Empty) == Empty then p1(pos._1 - 1, pos._2)
+          // try go right
+          else if cave.getOrElse((pos._1 + 1, pos._2), Empty) == Empty then p1(pos._1 + 1, pos._2)
+          // settle
+          else Some((pos._1, pos._2 - 1))
+        }
       }
 
-    extension (cave: Map[Coord, Square]) {
+    extension (cave: Map[Coord, Square])
       def getOrFloor(k: Coord) = if k._2 >= floor then Rock else cave.getOrElse(k, Empty)
-    }
 
     @tailrec
     def p2(pos: Coord): Option[Coord] =
-
       val sq = cave.getOrFloor(pos)
       // if blocked entrance
-      if sq == Sand && pos == (500, 0) then return None
+      if sq == Sand && pos == (500, 0) then None
       // if we're in empty space, this move was good and keep going
       else if sq == Empty then p2(pos._1, pos._2 + 1)
       else {
