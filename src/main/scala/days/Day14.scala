@@ -15,8 +15,8 @@ object Day14 extends aoc.Day {
   def coordRange(start: Coord, end: Coord): Seq[Coord] =
     if start == end then Seq(start)
     else if start._1 == end._1 then
-      (Iterator.continually(start._1)).zip(start._2 to end._2 by (if start._2 > end._2 then -1 else 1)).toSeq
-    else (start._1 to end._1 by (if start._1 > end._1 then -1 else 1)).zip(Iterator.continually(start._2))
+      (Iterator continually start._1).zip(start._2 to end._2 by (if start._2 > end._2 then -1 else 1)).toSeq
+    else (start._1 to end._1 by (if start._1 > end._1 then -1 else 1)) zip (Iterator continually start._2)
 
   def addNewSand(withFloor: Boolean)(floor: Int)(cave: Map[Coord, Square]): Option[Coord] = {
     @tailrec
@@ -48,11 +48,11 @@ object Day14 extends aoc.Day {
       else if sq == Empty then p2(pos._1, pos._2 + 1)
       else {
         // try go left
-        if cave.getOrFloor((pos._1 - 1, pos._2)) == Empty then p2(pos._1 - 1, pos._2)
+        if cave.getOrFloor(pos._1 - 1, pos._2) == Empty then p2(pos._1 - 1, pos._2)
         // try go right
-        else if cave.getOrFloor((pos._1 + 1, pos._2)) == Empty then p2(pos._1 + 1, pos._2)
+        else if cave.getOrFloor(pos._1 + 1, pos._2) == Empty then p2(pos._1 + 1, pos._2)
         // settle
-        else Some((pos._1, pos._2 - 1))
+        else Some(pos._1, pos._2 - 1)
       }
 
     if withFloor then p2(500, 0) else p1(500, 0)
