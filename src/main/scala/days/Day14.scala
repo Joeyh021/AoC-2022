@@ -16,45 +16,61 @@ object Day14 extends aoc.Day {
     if start == end then Seq(start)
     else if start._1 == end._1 then
       (Iterator.continually(start._1)).zip(start._2 to end._2 by (if start._2 > end._2 then -1 else 1)).toSeq
-    else if start._2 == end._2 then
-      (start._1 to end._1 by (if start._1 > end._1 then -1 else 1)).zip(Iterator.continually(start._2))
-    else throw Exception()
+    else (start._1 to end._1 by (if start._1 > end._1 then -1 else 1)).zip(Iterator.continually(start._2))
 
-  def addNewSand(min: Int)(cave: Map[Coord, Square]): Option[Coord] = {
-
+  def addNewSand(withFloor: Boolean)(floor: Int)(cave: Map[Coord, Square]): Option[Coord] = {
     @tailrec
-    def r(pos: Coord): Option[Coord] =
+    def p1(pos: Coord): Option[Coord] =
       // if oob, stop trying to place
-      if pos._2 >= min then return None
+      if pos._2 >= floor then return None
 
       val sq = cave.getOrElse(pos, Empty)
       // if we're in empty space, this move was good and keep going
-      if sq == Empty then r(pos._1, pos._2 + 1)
+      if sq == Empty then p1(pos._1, pos._2 + 1)
       else {
         // try go left
-        if cave.getOrElse((pos._1 - 1, pos._2), Empty) == Empty then r(pos._1 - 1, pos._2)
+        if cave.getOrElse((pos._1 - 1, pos._2), Empty) == Empty then p1(pos._1 - 1, pos._2)
         // try go right
-        else if cave.getOrElse((pos._1 + 1, pos._2), Empty) == Empty then r(pos._1 + 1, pos._2)
+        else if cave.getOrElse((pos._1 + 1, pos._2), Empty) == Empty then p1(pos._1 + 1, pos._2)
         // settle
         else Some((pos._1, pos._2 - 1))
       }
 
-    r(500, 0)
+    extension (cave: Map[Coord, Square]) {
+      def getOrFloor(k: Coord) = if k._2 >= floor then Rock else cave.getOrElse(k, Empty)
+    }
+
+    @tailrec
+    def p2(pos: Coord): Option[Coord] =
+
+      val sq = cave.getOrFloor(pos)
+      // if blocked entrance
+      if sq == Sand && pos == (500, 0) then return None
+      // if we're in empty space, this move was good and keep going
+      else if sq == Empty then p2(pos._1, pos._2 + 1)
+      else {
+        // try go left
+        if cave.getOrFloor((pos._1 - 1, pos._2)) == Empty then p2(pos._1 - 1, pos._2)
+        // try go right
+        else if cave.getOrFloor((pos._1 + 1, pos._2)) == Empty then p2(pos._1 + 1, pos._2)
+        // settle
+        else Some((pos._1, pos._2 - 1))
+      }
+
+    if withFloor then p2(500, 0) else p1(500, 0)
   }
 
   override def solve(input: String) =
-    val parsed = input.linesIterator
+    val cave = input.linesIterator
       .map(_.split("->").map { x =>
         val p = x.split(",").map(_.trim.toInt); (p(0), p(1))
-      }.toIndexedSeq)
-      .toIndexedSeq
+      })
+      .foldLeft(Map[Coord, Square]()) { (cave, coords) =>
+        cave ++ coords.iterator.sliding(2).flatMap(p => coordRange(p(0), p(1)).zip(Iterator continually Rock))
+      }
 
-    var cave = parsed.foldLeft(Map[Coord, Square]()) { (cave, coords) =>
-      cave ++ coords.iterator.sliding(2).flatMap(p => coordRange(p(0), p(1)).zip(Iterator continually Rock))
-    }
-
-    val abyss  = parsed.flatten.map(_._2).max + 1
-    val doSand = addNewSand(abyss)
+    val abyss = cave.keys.map(_._2).max + 1
+    val floor = cave.keys.map(_._2).max + 2
 
     @tailrec
     def run[S](s: S, f: (S => Option[S])): S =
@@ -62,6 +78,12 @@ object Day14 extends aoc.Day {
         case None     => s
         case Some(ns) => run(ns, f)
 
-    (run(cave, (cave => doSand(cave).map(ns => cave + (ns -> Sand)))).values.count(_ == Sand), 0)
+    val rp1 = addNewSand(false)(abyss)
+    val rp2 = addNewSand(true)(floor)
+
+    val countSand = (f: Map[Coord, Square] => Option[Coord]) =>
+      run(cave, (cave => f(cave).map(ns => cave + (ns -> Sand)))).values.count(_ == Sand)
+
+    (countSand(rp1), countSand(rp2))
 
 }
